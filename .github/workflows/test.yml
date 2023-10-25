@@ -28,7 +28,7 @@ jobs:
               pull_number: context.issue.number
             });
             for (const review of reviews) {
-              if (review.user.login === 'aakash-dhingra' && review.state === 'APPROVED') {
+              if (review.user.login === 'KrishnaPraneethEranki' && review.state === 'APPROVED') {
                 approved = true;
                 break;
               }
