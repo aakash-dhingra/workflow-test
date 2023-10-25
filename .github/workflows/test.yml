@@ -16,19 +16,21 @@ jobs:
       run: echo "Tester should review the SQL file changes"
 
     # This is a placeholder, you might want to replace with an actual test or notification system
-    - name: Wait for tester's approval
+       - name: Wait for tester's approval
       uses: actions/github-script@v5
       with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
+          const { owner, repo, number: pull_number } = context.issue;
           let approved = false;
           while (!approved) {
             const { data: reviews } = await github.pulls.listReviews({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number
+              owner,
+              repo,
+              pull_number
             });
             for (const review of reviews) {
-              if (review.user.login === 'aakash-dhingra' && review.state === 'APPROVED') {
+              if (review.user.login === 'KrishnaPraneethEranki' && review.state === 'APPROVED') {
                 approved = true;
                 break;
               }
@@ -37,6 +39,7 @@ jobs:
               await new Promise(resolve => setTimeout(resolve, 60000));  // check every minute
             }
           }
+
 
   # lead_approval:
   #   needs: tester_approval
