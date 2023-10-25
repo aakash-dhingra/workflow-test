@@ -1,0 +1,69 @@
+name: SQL Pull Request Workflow
+
+on:
+  pull_request:
+    paths:
+      - 'sql/*.sql' # Only run when SQL files change
+
+jobs:
+  tester_approval:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Notify tester
+      run: echo "Tester should review the SQL file changes"
+
+    # This is a placeholder, you might want to replace with an actual test or notification system
+    - name: Wait for tester's approval
+      uses: actions/github-script@v5
+      with:
+        script: |
+          let approved = false;
+          while (!approved) {
+            const { data: reviews } = await github.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            for (const review of reviews) {
+              if (review.user.login === 'aakash-dhingra' && review.state === 'APPROVED') {
+                approved = true;
+                break;
+              }
+            }
+            if (!approved) {
+              await new Promise(resolve => setTimeout(resolve, 60000));  // check every minute
+            }
+          }
+
+  # lead_approval:
+  #   needs: tester_approval
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Notify lead
+  #     run: echo "Lead should review the SQL file changes after tester's approval"
+# 
+    # # This is a placeholder, you might want to replace with an actual notification system
+    # - name: Wait for lead's approval
+    #   uses: actions/github-script@v5
+    #   with:
+    #     script: |
+    #       let approved = false;
+    #       while (!approved) {
+    #         const { data: reviews } = await github.pulls.listReviews({
+    #           owner: context.repo.owner,
+    #           repo: context.repo.repo,
+    #           pull_number: context.issue.number
+    #         });
+    #         for (const review of reviews) {
+    #           if (review.user.login === 'LEAD_USERNAME' && review.state === 'APPROVED') {
+    #             approved = true;
+    #             break;
+    #           }
+    #         }
+    #         if (!approved) {
+    #           await new Promise(resolve => setTimeout(resolve, 60000));  // check every minute
+    #         }
+    #       }
